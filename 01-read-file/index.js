@@ -16,14 +16,14 @@ const process = require('process');
 //     path.join(__dirname,'text.txt'));
 const newPath = path.join(__dirname,'text.txt');
 const newStream = new fs.ReadStream(newPath, {encoding: 'utf-8'}); // {encoding: 'utf-8'} === 'utf-8'
-newStream.on('readable', function(){
+newStream.on('readable', function(){                 // on === addListener
     let data = newStream.read();
     if(data != null) process.stdout.write(data);//console.log(data);
 });
 
-newStream.on('end', function(){
-    console.log("THE END");
-});
+// newStream.on('end', function(){
+//     console.log("THE END");
+// });
 
 newStream.on('error', function(err){
     if(err.code == 'ENOENT'){
@@ -32,3 +32,8 @@ newStream.on('error', function(err){
         console.error(err);
     }
 });
+
+
+// //  Another way:
+// const anotherStream = fs.createReadStream(path.resolve(__dirname, 'text.txt'));
+// anotherStream.on('data', (data) => { console.log(data.toString()); });
