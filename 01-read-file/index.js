@@ -19,7 +19,8 @@ const newStream = new fs.ReadStream(newPath, {encoding: 'utf-8'}); // {encoding:
 newStream.on('readable', function(){                 // on === addListener
     let data = newStream.read();
     if(data != null)
-        ;//console.log(data);
+        process.stdout.write(data);
+        // console.log(data);
 });
 
 // newStream.on('end', function(){
