@@ -1,9 +1,6 @@
 const path = require('path');
 const {readdir, stat} = require('fs/promises');
 
-
-
-
 const filesPath = path.resolve(__dirname, 'secret-folder');
 // console.log(filesPath);
 
