@@ -22,7 +22,7 @@ const getStreamData = (files, src) => {
         for (const file of files) {
             const filesPath = path.resolve(src, file);
             const newStream = fs.createReadStream(filesPath);
-            newStream.on('data', data => finalData.push(data + '\n'));
+            newStream.on('data', data => finalData.push(data));
             newStream.on('end', () => res(finalData))
         }
     })
