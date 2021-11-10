@@ -46,20 +46,27 @@ const changeTags = async (str, arr, dir) => {
     return str;
 }
 
-const getStreamData = (files, src) => {
-    let finalData = [];
+async function getDataFromCurrentFile(file, src)
+{
+    let dataString = '';
     return new Promise((res) => {
-        for (const file of files) {
-            const filesPath = path.resolve(src, file);
-            const newStream = fs.createReadStream(filesPath);
-            newStream.on('data', data => finalData.push(data));
-            newStream.on('end', () => res(finalData))
-        }
+        const filesPath = path.resolve(src, file);
+        const newStream = fs.createReadStream(filesPath);
+        newStream.on('data', data => dataString += data);
+        newStream.on('end', () => res(dataString))
     })
 }
 
+const getStreamData = async (files, src) => {
+    let finalData = [];
+    for (const file of files) {
+        finalData.push(await getDataFromCurrentFile(file, src))
+    }
+    return finalData;
+}
+
 const writeStreamData = async (data, dist) => {
-    let bundle = fs.createWriteStream(dist);
+    let bundle = await fs.createWriteStream(dist);
     for (const dataPart of data) {
         bundle.write(dataPart, err => {
             if (err) throw err;

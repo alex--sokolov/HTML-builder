@@ -7,30 +7,37 @@ const distDir = path.resolve(__dirname, 'project-dist', 'bundle.css');
 const ext = 'css';
 
 const getFiles = async (src) => {
-    const readFiles = await readdir(src, {withFileTypes: "true"})
     let result = [];
+    const readFiles = await readdir(src, {withFileTypes: "true"})
     readFiles.filter(el => el.isFile()).forEach((el) => {
         if (ext === path.extname(el.name).slice(1)) result.push(el.name)
     })
     return result;
 }
 
-
-const getStreamData = (files, src) => {
-    let finalData = [];
+async function getDataFromCurrentFile(file, src)
+{
+    let dataString = '';
     return new Promise((res) => {
-        for (const file of files) {
             const filesPath = path.resolve(src, file);
             const newStream = fs.createReadStream(filesPath);
-            newStream.on('data', data => finalData.push(data));
-            newStream.on('end', () => res(finalData))
-        }
+            newStream.on('data', data => dataString += data);
+            newStream.on('end', () => res(dataString))
     })
 }
 
 
+const getStreamData = async (files, src) => {
+    let finalData = [];
+    for (const file of files) {
+        finalData.push(await getDataFromCurrentFile(file, src))
+    }
+    return finalData;
+}
+
+
 const writeStreamData = async (data, dist) => {
-    let bundle = fs.createWriteStream(dist);
+    let bundle = await fs.createWriteStream(dist);
     for (const dataPart of data) {
         bundle.write(dataPart, err => {
             if (err) throw err;
@@ -42,5 +49,5 @@ const writeStreamData = async (data, dist) => {
 (async () => {
     const cssFiles = await getFiles(srcDir);
     const data = await getStreamData(cssFiles, srcDir);
-    writeStreamData(data, distDir);
+    await writeStreamData(data, distDir);
 })();
